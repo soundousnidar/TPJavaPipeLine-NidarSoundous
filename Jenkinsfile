@@ -1,11 +1,15 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'my-maven-git:latest'
+            args '-v $HOME/.m2:/root/.m2'
+        }
+    }
 
     stages {
         stage('Checkout') {
             steps {
-                sh 'rm -rf java-maven || true'
-                sh 'git clone https://github.com/simoks/java-maven.git'
+                echo 'Code already checked out by Jenkins from GitHub'
             }
         }
 
@@ -14,9 +18,10 @@ pipeline {
                 script {
                     def currentDir = pwd()
                     echo "Current directory: ${currentDir}"
-                    dir('java-maven/maven') {
+                    
+                    dir('java-maven') {
                         sh 'mvn clean test package'
-                        sh 'java -jar target/maven-0.0.1-SNAPSHOT.jar'
+                        sh 'java -jar target/java-maven-1.0-SNAPSHOT.jar'
                     }
                 }
             }
