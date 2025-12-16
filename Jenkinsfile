@@ -1,14 +1,16 @@
 pipeline {
-    // Utilise n'importe quel agent Jenkins disponible
-    agent any
+    agent {
+        docker {
+            image 'my-maven-git:latest'
+            args '-v $HOME/.m2:/root/.m2'
+        }
+    }
 
     stages {
         stage('Checkout') {
             steps {
-                // Nettoyer le workspace avant le checkout
-                bat "rmdir /s /q *"
-                // Cloner le dépôt Git
-                bat "git clone https://github.com/simoks/java-maven.git"
+                sh 'rm -rf *'
+                sh 'git clone https://github.com/simoks/java-maven.git'
             }
         }
 
@@ -17,12 +19,9 @@ pipeline {
                 script {
                     def currentDir = pwd()
                     echo "Current directory: ${currentDir}"
-                    // Aller dans le dossier contenant le projet Maven
                     dir('java-maven/maven') {
-                        // Lancer Maven
-                        bat 'mvn clean test package'
-                        // Exécuter le jar généré
-                        bat 'java -jar target/maven-0.0.1-SNAPSHOT.jar'
+                        sh 'mvn clean test package'
+                        sh 'java -jar target/maven-0.0.1-SNAPSHOT.jar'
                     }
                 }
             }
