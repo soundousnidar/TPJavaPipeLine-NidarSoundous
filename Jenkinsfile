@@ -1,15 +1,10 @@
 pipeline {
-    agent {
-        docker {
-            image 'my-maven-git:latest'
-            args '-v $HOME/.m2:/root/.m2'
-        }
-    }
+    agent any
 
     stages {
         stage('Checkout') {
             steps {
-                sh 'rm -rf *'
+                sh 'rm -rf java-maven || true'
                 sh 'git clone https://github.com/simoks/java-maven.git'
             }
         }
